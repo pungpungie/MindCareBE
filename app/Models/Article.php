@@ -6,15 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Article extends Model
 {
-    protected $primaryKey = 'journal_id';
+    protected $table = 'articles';
 
-protected $fillable = [
-    'user_id', 'title', 'content', 
-    'mood_before', 'mood_after', 'journal_date'
-];
+    protected $primaryKey = 'article_id';
 
-public function user()
-{
-    return $this->belongsTo(User::class);
-}
+    protected $fillable = [
+        'title',
+        'content',
+        'category',
+        'mood_tag'
+    ];
 }

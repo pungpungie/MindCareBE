@@ -2,48 +2,63 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\DailyJournal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class JournalController extends Controller
+class JournalController extends BaseController
 {
     /**
-     * GET: Lihat semua jurnal user yang login
+     * List jurnal user
      */
     public function index(Request $request)
     {
-        $journals = DailyJournal::where('user_id', $request->user()->id)
-                    ->orderBy('journal_date', 'desc')
-                    ->get();
+        $query = DailyJournal::where('user_id', $request->user()->id)
+                    ->orderBy('journal_date', 'desc');
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Daftar jurnal harian',
-            'data' => $journals
-        ], 200);
+        // Filter by date
+        if ($request->has('date')) {
+            $query->whereDate('journal_date', $request->date);
+        }
+
+        // Filter by month
+        if ($request->has('month')) {
+            $query->whereMonth('journal_date', $request->month);
+        }
+
+        $journals = $query->get();
+
+        // Hitung statistik
+        $stats = [
+            'total_jurnal' => $journals->count(),
+            'rata_mood_before' => round($journals->avg('mood_before'), 1),
+            'rata_mood_after' => round($journals->avg('mood_after'), 1),
+        ];
+
+        return $this->successResponse([
+            'stats' => $stats,
+            'journals' => $journals
+        ], 'Daftar jurnal harian');
     }
 
     /**
-     * POST: Buat jurnal baru
+     * Buat jurnal baru
      */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'required|string|min:10',
             'mood_before' => 'required|integer|min:1|max:10',
             'mood_after' => 'required|integer|min:1|max:10',
-            'journal_date' => 'required|date'
+            'journal_date' => 'required|date|before_or_equal:today'
+        ], [
+            'content.min' => 'Isi jurnal minimal 10 karakter',
+            'journal_date.before_or_equal' => 'Tanggal jurnal tidak boleh lebih dari hari ini'
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->validationErrorResponse($validator->errors());
         }
 
         $journal = DailyJournal::create([
@@ -55,23 +70,19 @@ class JournalController extends Controller
             'journal_date' => $request->journal_date
         ]);
 
-        // Hitung perubahan mood
+        // Analisis mood
         $moodChange = $request->mood_after - $request->mood_before;
-        $moodStatus = $moodChange > 0 ? 'Mood membaik' : ($moodChange < 0 ? 'Mood menurun' : 'Mood tetap');
+        $moodAnalysis = $this->analyzeMoodChange($moodChange);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Jurnal berhasil disimpan',
-            'data' => [
-                'journal' => $journal,
-                'mood_change' => $moodChange,
-                'mood_status' => $moodStatus
-            ]
-        ], 201);
+        return $this->successResponse([
+            'journal' => $journal,
+            'mood_change' => $moodChange,
+            'mood_analysis' => $moodAnalysis
+        ], 'Jurnal berhasil disimpan', 201);
     }
 
     /**
-     * GET: Lihat detail satu jurnal
+     * Detail jurnal
      */
     public function show($id)
     {
@@ -80,20 +91,14 @@ class JournalController extends Controller
                     ->first();
 
         if (!$journal) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Jurnal tidak ditemukan'
-            ], 404);
+            return $this->notFoundResponse('Jurnal tidak ditemukan');
         }
 
-        return response()->json([
-            'status' => true,
-            'data' => $journal
-        ], 200);
+        return $this->successResponse($journal, 'Detail jurnal');
     }
 
     /**
-     * PUT: Update jurnal
+     * Update jurnal
      */
     public function update(Request $request, $id)
     {
@@ -102,23 +107,28 @@ class JournalController extends Controller
                     ->first();
 
         if (!$journal) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Jurnal tidak ditemukan'
-            ], 404);
+            return $this->notFoundResponse('Jurnal tidak ditemukan');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'sometimes|string|max:255',
+            'content' => 'sometimes|string|min:10',
+            'mood_before' => 'sometimes|integer|min:1|max:10',
+            'mood_after' => 'sometimes|integer|min:1|max:10',
+            'journal_date' => 'sometimes|date|before_or_equal:today'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator->errors());
         }
 
         $journal->update($request->only(['title', 'content', 'mood_before', 'mood_after', 'journal_date']));
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Jurnal berhasil diupdate',
-            'data' => $journal
-        ], 200);
+        return $this->successResponse($journal, 'Jurnal berhasil diupdate');
     }
 
     /**
-     * DELETE: Hapus jurnal
+     * Hapus jurnal
      */
     public function destroy($id)
     {
@@ -127,17 +137,23 @@ class JournalController extends Controller
                     ->first();
 
         if (!$journal) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Jurnal tidak ditemukan'
-            ], 404);
+            return $this->notFoundResponse('Jurnal tidak ditemukan');
         }
 
         $journal->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Jurnal berhasil dihapus'
-        ], 200);
+        return $this->successResponse(null, 'Jurnal berhasil dihapus');
+    }
+
+    /**
+     * Analisis perubahan mood
+     */
+    private function analyzeMoodChange($change)
+    {
+        if ($change > 3) return 'Mood sangat membaik setelah menulis! ✨';
+        if ($change > 0) return 'Mood sedikit membaik 📈';
+        if ($change == 0) return 'Mood tetap stabil ➡️';
+        if ($change >= -3) return 'Mood sedikit menurun 📉';
+        return 'Mood cukup menurun. Mungkin perlu aktivitas menyenangkan lainnya 💙';
     }
 }

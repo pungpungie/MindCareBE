@@ -12,8 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Ini yang bikin error tidak muncul lagi
+        $middleware->redirectGuestsTo(function ($request) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->shouldRenderJsonWhen(function (\Illuminate\Http\Request $request) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
     })->create();

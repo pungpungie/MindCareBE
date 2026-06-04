@@ -51,4 +51,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ChatbotMessage::class);
     }
+        // Di dalam class User, tambahkan ini:
+    protected static function boot()
+    {
+        parent::boot();
+        
+        // Auto logout setelah 7 hari
+        static::deleting(function ($user) {
+            $user->tokens()->delete();
+        });
+}
 }
