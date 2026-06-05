@@ -1,58 +1,222 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🧠 MindCare Apps
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> Backend API untuk aplikasi kesehatan mental berbasis AI — membantu pengguna memantau suasana hati, menulis jurnal, dan berinteraksi dengan chatbot empatik.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 Daftar Isi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [Tentang Proyek](#tentang-proyek)
+- [Fitur Utama](#fitur-utama)
+- [Tech Stack](#tech-stack)
+- [Instalasi & Setup](#instalasi--setup)
+- [Environment Variables](#environment-variables)
+- [API Endpoints](#api-endpoints)
+- [Struktur Proyek](#struktur-proyek)
+- [Lisensi](#lisensi)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Tentang Proyek
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**MindCare Apps** adalah RESTful API backend yang dibangun dengan Laravel 13, dirancang sebagai fondasi untuk aplikasi kesehatan mental. Pengguna dapat melakukan mood check-in harian, menulis jurnal pribadi, membaca artikel kesehatan, dan mengobrol dengan chatbot bertenaga AI yang responsif dan empatik.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Fitur Utama
 
-## Agentic Development
+- 🔐 **Autentikasi** — Register, login, logout, dan hapus akun menggunakan Laravel Sanctum
+- 😊 **Mood Check** — Kuesioner suasana hati harian dengan riwayat lengkap
+- 📓 **Jurnal Harian** — Buat dan baca, jurnal pribadi dengan skor mood sebelum & sesudah menulis
+- 📰 **Artikel** — Konten kesehatan mental yang bisa dibaca
+- 🤖 **Chatbot AI** — Percakapan dengan AI empatik beserta riwayat chat tersimpan
+- 📊 **Daily Summary** — Ringkasan harian aktivitas pengguna lengkap dengan analisis AI
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
+## Tech Stack
+
+| Layer | Teknologi |
+|---|---|
+| Framework | Laravel 13 |
+| PHP | ^8.3 |
+| Autentikasi | Laravel Sanctum |
+| Database | SQLite (default) / MySQL |
+| AI Integration | HTTP Client ke external AI API |
+
+---
+
+## Instalasi & Setup
+
+### Prasyarat
+
+- PHP >= 8.3
+- Composer
+- Node.js & NPM
+
+### Langkah Instalasi
+
+**1. Clone repositori**
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/username/MindCareApps.git
+cd MindCareApps
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+**2. Jalankan setup otomatis** *(install semua dependency, generate key, dan migrasi)*
+```bash
+composer run setup
+```
 
-## Contributing
+Atau lakukan secara manual:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+# Install dependency PHP
+composer install
 
-## Code of Conduct
+# Salin file environment
+cp .env.example .env
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Generate application key
+php artisan key:generate
 
-## Security Vulnerabilities
+# Jalankan migrasi & seeder
+php artisan migrate --seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**3. Jalankan server development**
+```bash
+composer run dev
+```
 
-## License
+API akan berjalan di `http://127.0.0.1:8000`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## Environment Variables
+
+Salin `.env.example` menjadi `.env` lalu sesuaikan nilai berikut:
+
+```env
+APP_NAME=MindCare
+APP_URL=http://localhost
+
+DB_CONNECTION=sqlite
+# Untuk MySQL, uncomment dan isi:
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=mindcare
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# API Key untuk integrasi AI (chatbot & analisis)
+GEMINI_API_KEY=your_api_key_here
+```
+
+---
+
+## API Endpoints
+
+Base URL: `http://127.0.0.1:8000/api`
+
+Semua endpoint bertanda 🔒 membutuhkan header:
+```
+Authorization: Bearer {token}
+```
+
+### Auth
+
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| POST | `/register` | Daftar akun baru |
+| POST | `/login` | Login & dapatkan token |
+| POST | `/logout` | 🔒 Logout |
+| GET | `/profile` | 🔒 Lihat profil |
+| DELETE | `/account` | 🔒 Hapus akun |
+
+### Mood Check
+
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| GET | `/mood-questions` | 🔒 Ambil daftar pertanyaan mood |
+| POST | `/mood-check` | 🔒 Submit jawaban mood check |
+| GET | `/mood-history` | 🔒 Riwayat mood check |
+
+### Jurnal
+
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| GET | `/journals` | 🔒 List semua jurnal |
+| POST | `/journals` | 🔒 Buat jurnal baru |
+
+### Artikel
+
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| GET | `/articles` | List artikel *(publik)* |
+| GET | `/articles/{id}` | Detail artikel *(publik)* |
+
+### Chatbot
+
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| POST | `/chatbot/send` | 🔒 Kirim pesan ke chatbot AI |
+| GET | `/chatbot/history` | 🔒 Riwayat percakapan |
+
+### Daily Summary
+
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| GET | `/daily-summary` | 🔒 Ringkasan harian |
+| POST | `/daily-summary/ai-analysis` | 🔒 Analisis AI dari aktivitas hari ini |
+
+### Format Response
+
+**Sukses:**
+```json
+{
+  "success": true,
+  "message": "Berhasil",
+  "data": { }
+}
+```
+
+**Error:**
+```json
+{
+  "success": false,
+  "message": "Pesan error",
+  "errors": { }
+}
+```
+
+**HTTP Status Codes:** `200` OK · `201` Created · `401` Unauthorized · `404` Not Found · `422` Validation Error · `500` Server Error
+
+---
+
+## Struktur Proyek
+
+```
+MindCareApps/
+├── app/
+│   ├── Http/Controllers/Api/
+│   │   ├── AuthController.php
+│   │   ├── MoodCheckController.php
+│   │   ├── JournalController.php
+│   │   ├── ArticleController.php
+│   │   ├── ChatbotController.php
+│   │   └── DailySummaryController.php
+│   └── Models/
+│       ├── User.php
+│       ├── MoodCheckin.php
+│       ├── MoodQuestion.php
+│       ├── DailyJournal.php
+│       ├── Article.php
+│       └── ChatbotMessage.php
+├── database/
+│   ├── migrations/
+│   └── seeders/
+├── routes/
+│   └── api.php
+├── .env.example
+└── API_DOCUMENTATION.md
+```
