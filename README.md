@@ -98,16 +98,15 @@ Salin `.env.example` menjadi `.env` lalu sesuaikan nilai berikut:
 APP_NAME=MindCare
 APP_URL=http://localhost
 
-DB_CONNECTION=sqlite
-# Untuk MySQL, uncomment dan isi:
-# DB_HOST=127.0.0.1
-# DB_PORT=3306
-# DB_DATABASE=mindcare
-# DB_USERNAME=root
-# DB_PASSWORD=
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_mindcareapps
+DB_USERNAME=root
+DB_PASSWORD=
 
 # API Key untuk integrasi AI (chatbot & analisis)
-GEMINI_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_api_key_here
 ```
 
 ---
