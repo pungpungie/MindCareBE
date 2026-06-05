@@ -13,7 +13,6 @@
 - [Environment Variables](#environment-variables)
 - [API Endpoints](#api-endpoints)
 - [Struktur Proyek](#struktur-proyek)
-- [Lisensi](#lisensi)
 
 ---
 
@@ -57,8 +56,8 @@
 
 **1. Clone repositori**
 ```bash
-git clone https://github.com/username/MindCareApps.git
-cd MindCareApps
+git clone https://github.com/pungpungie/MindCareBE
+cd MindCareBE
 ```
 
 **2. Jalankan setup otomatis** *(install semua dependency, generate key, dan migrasi)*
