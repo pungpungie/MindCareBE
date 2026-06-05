@@ -30,7 +30,6 @@
 - 📓 **Jurnal Harian** — Buat dan baca, jurnal pribadi dengan skor mood sebelum & sesudah menulis
 - 📰 **Artikel** — Konten kesehatan mental yang bisa dibaca
 - 🤖 **Chatbot AI** — Percakapan dengan AI empatik beserta riwayat chat tersimpan
-- 📊 **Daily Summary** — Ringkasan harian aktivitas pengguna lengkap dengan analisis AI
 
 ---
 
@@ -161,13 +160,6 @@ Authorization: Bearer {token}
 |---|---|---|
 | POST | `/chatbot/send` | 🔒 Kirim pesan ke chatbot AI |
 | GET | `/chatbot/history` | 🔒 Riwayat percakapan |
-
-### Daily Summary
-
-| Method | Endpoint | Deskripsi |
-|---|---|---|
-| GET | `/daily-summary` | 🔒 Ringkasan harian |
-| POST | `/daily-summary/ai-analysis` | 🔒 Analisis AI dari aktivitas hari ini |
 
 ### Format Response
 
