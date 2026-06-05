@@ -195,8 +195,7 @@ MindCareApps/
 │   │   ├── MoodCheckController.php
 │   │   ├── JournalController.php
 │   │   ├── ArticleController.php
-│   │   ├── ChatbotController.php
-│   │   └── DailySummaryController.php
+│   │   └── ChatbotController.php
 │   └── Models/
 │       ├── User.php
 │       ├── MoodCheckin.php
